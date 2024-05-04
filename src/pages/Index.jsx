@@ -1,8 +1,9 @@
 // Complete the Index page component here
 // Use chakra-ui
 import { useState } from "react";
-import { Box, Button, Textarea, VStack, Text } from "@chakra-ui/react";
+import { Button, Textarea, VStack, Text } from "@chakra-ui/react";
 import { FaRobot } from "react-icons/fa";
+import { create } from "../../lib/openai";
 
 const Index = () => {
   const [text, setText] = useState("");
@@ -13,10 +14,15 @@ const Index = () => {
   };
 
   const summarizeText = async () => {
-    // Simulating a call to an AI API like OpenAI's GPT-3.5
-    // This is a placeholder function since we can't make actual API calls here.
-    const simulatedResponse = "This is a summary of the text.";
-    setSummary(simulatedResponse);
+    const response = await create({
+      messages: [{ role: "system", content: text }],
+      model: "gpt-3.5-turbo",
+    });
+    if (response && response.data && response.data.choices && response.data.choices.length > 0) {
+      setSummary(response.data.choices[0].message.content);
+    } else {
+      setSummary("Failed to generate summary.");
+    }
   };
 
   return (
